@@ -1,4 +1,4 @@
-const CACHE_NAME = "metronomo-flamenco-v14";
+const CACHE_NAME = "metronomo-flamenco-v15";
 const APP_ASSETS = [
   "./",
   "./index.html",

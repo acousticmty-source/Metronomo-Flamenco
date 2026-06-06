@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#050404">
     <title>Metrónomo Flamenco</title>
-    <link rel="manifest" href="manifest.webmanifest?v=14">
-    <link rel="icon" href="icon.svg?v=14" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css?v=14">
+    <link rel="manifest" href="manifest.webmanifest?v=15">
+    <link rel="icon" href="icon.svg?v=15" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css?v=15">
   </head>
   <body>
     <main class="poster-shell app-only">
@@ -26,7 +26,17 @@
             <div class="app-nav">
               <button type="button" aria-label="Menú">☰</button>
               <div class="select-wrap compact-select">
-                <select id="paloSelect" aria-label="Seleccionar palo flamenco"></select>
+                <select id="paloSelect" aria-label="Seleccionar palo flamenco">
+                  <option value="rumbas">Rumbas</option>
+                  <option value="tangos">Tangos</option>
+                  <option value="bulerias">Bulerías 12-3-7-8-10</option>
+                  <option value="buleriasClasica">Bulerías 12-3-6-8-10</option>
+                  <option value="alegrias">Alegrías</option>
+                  <option value="soleaPorBuleria">Soleá por Bulería</option>
+                  <option value="seguiriyas">Seguiriyas</option>
+                  <option value="fandangos">Fandangos</option>
+                  <option value="sevillanas">Sevillanas</option>
+                </select>
               </div>
               <button type="button" aria-label="Ajustes">⚙</button>
             </div>
@@ -42,7 +52,12 @@
             <section class="control-panel" aria-label="Controles del metrónomo">
               <label class="field-label sr-only" for="soundSelect">Sonido</label>
               <div class="select-wrap sound-wrap">
-                <select id="soundSelect" aria-label="Seleccionar sonido del metrónomo"></select>
+                <select id="soundSelect" aria-label="Seleccionar sonido del metrónomo">
+                  <option value="palmas">Palmas secas</option>
+                  <option value="madera">Madera</option>
+                  <option value="cajon">Cajón tapa</option>
+                  <option value="clickSuave">Click suave</option>
+                </select>
               </div>
 
               <div class="bpm-section">
@@ -83,6 +98,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=14"></script>
+    <script src="app.js?v=15"></script>
   </body>
 </html>

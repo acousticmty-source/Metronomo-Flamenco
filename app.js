@@ -146,19 +146,8 @@ let customSelectsReady = false;
 function init() {
   elements.barsLimit.textContent = Number.isFinite(FREE_DEMO_BARS) ? String(FREE_DEMO_BARS) : "âˆž";
 
-  Object.entries(palos).forEach(([key, palo]) => {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = palo.label;
-    elements.paloSelect.append(option);
-  });
-
-  Object.entries(soundPresets).forEach(([key, sound]) => {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = sound.label;
-    elements.soundSelect.append(option);
-  });
+  populateSelect(elements.paloSelect, palos);
+  populateSelect(elements.soundSelect, soundPresets);
 
   elements.paloSelect.value = selectedPaloKey;
   elements.soundSelect.value = selectedSoundKey;
@@ -167,6 +156,23 @@ function init() {
   bindEvents();
   updatePalo(selectedPaloKey);
   registerServiceWorker();
+}
+
+function populateSelect(select, items) {
+  if (select.options.length === 0) {
+    Object.entries(items).forEach(([key, item]) => {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = item.label;
+      select.append(option);
+    });
+    return;
+  }
+
+  [...select.options].forEach((option) => {
+    const item = items[option.value];
+    if (item) option.textContent = item.label;
+  });
 }
 
 function enhanceSelect(select) {
@@ -562,7 +568,7 @@ function playNoiseHit({ time, duration, band, lowpass: lowpassFrequency, highpas
   master.gain.setValueAtTime(0.82, time);
 
   noise.connect(highpass).connect(bandpass).connect(lowpass).connect(noiseGain).connect(master).connect(audioContext.destination);
-  body.connect(bodyGaiž).connect(master);
+  body.connect(bodyGain).connect(master);
   noise.start(time);
   body.start(time);
   noise.stop(time + duration);
@@ -625,4 +631,8 @@ function updateBarsCounter() {
   elements.barsCounter.textContent = String(Math.min(completedBars, FREE_DEMO_BARS));
 }
 
-init();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init, { once: true });
+} else {
+  init();
+}
