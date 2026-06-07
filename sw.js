@@ -1,9 +1,9 @@
-const CACHE_NAME = "metronomo-flamenco-v28";
+const CACHE_NAME = "metronomo-flamenco-v29";
 const APP_ASSETS = [
   "./",
   "./index.html",
-  "./styles-v28.css",
-  "./app-v28.js",
+  "./styles-v29.css",
+  "./app-v29.js",
   "./audio/samples/palma-acento.wav",
   "./audio/samples/palma-pulso.wav",
   "./audio/samples/cajon-agudo.wav",
