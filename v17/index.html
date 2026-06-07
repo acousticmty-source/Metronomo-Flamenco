@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#050404">
+    <title>Metrónomo Flamenco</title>
+    <link rel="manifest" href="../manifest.webmanifest?v=17">
+    <link rel="icon" href="../icon.svg?v=17" type="image/svg+xml">
+    <link rel="stylesheet" href="../styles.css?v=17">
+  </head>
+  <body>
+    <main class="poster-shell app-only">
+      <aside class="phone-area" aria-label="App metrónomo">
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="app-nav">
+              <div class="select-wrap compact-select">
+                <select id="paloSelect" aria-label="Seleccionar palo flamenco">
+                  <option value="rumbas">Rumbas</option>
+                  <option value="tangos">Tangos</option>
+                  <option value="bulerias">Bulerías 12-3-7-8-10</option>
+                  <option value="buleriasClasica">Bulerías 12-3-6-8-10</option>
+                  <option value="alegrias">Alegrías</option>
+                  <option value="soleaPorBuleria">Soleá por Bulería</option>
+                  <option value="seguiriyas">Seguiriyas</option>
+                  <option value="fandangos">Fandangos</option>
+                  <option value="sevillanas">Sevillanas</option>
+                </select>
+              </div>
+              <button class="settings-button" id="settingsButton" type="button" aria-label="Ajustes">⚙</button>
+            </div>
+
+            <div class="settings-panel" id="settingsPanel" hidden>
+              <span>Modo</span>
+              <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Oscuro</button>
+            </div>
+            <span id="patternName" hidden>Rumbas</span>
+
+            <section class="compas-section" aria-label="Compás visual">
+              <div class="demo-counter"><strong id="barsCounter">0</strong>/<span id="barsLimit">8</span></div>
+              <div class="beat-clock" id="beatGrid" aria-live="polite" aria-label="Reloj del compás"></div>
+            </section>
+
+            <section class="control-panel" aria-label="Controles del metrónomo">
+              <select class="sr-only" id="soundSelect" aria-label="Seleccionar sonido del metrónomo">
+                <option value="palmas">Palmas secas</option>
+                <option value="madera">Madera</option>
+                <option value="cajon">Cajón tapa</option>
+                <option value="clickSuave">Click suave</option>
+              </select>
+
+              <div class="bpm-section">
+                <span class="field-label">BPM</span>
+                <div class="bpm-control">
+                  <button class="round-button" id="decreaseBpm" type="button" aria-label="Bajar BPM">−</button>
+                  <output class="bpm-value" id="bpmValue" for="bpmSlider">100</output>
+                  <button class="round-button" id="increaseBpm" type="button" aria-label="Subir BPM">+</button>
+                </div>
+                <input id="bpmSlider" type="range" min="40" max="240" value="100" aria-label="Ajustar BPM">
+              </div>
+
+              <div class="transport-row">
+                <button class="secondary-button mini-transport" type="button" aria-label="Bajar BPM" data-bpm-minus>−</button>
+                <button class="primary-button play-button" id="startButton" type="button" aria-label="Iniciar">▶</button>
+                <button class="secondary-button mini-transport" type="button" aria-label="Subir BPM" data-bpm-plus>+</button>
+              </div>
+              <button class="secondary-button stop-full" id="stopButton" type="button">Detener</button>
+
+              <a class="unlock-button" id="unlockButton" href="#" target="_blank" rel="noopener">Desbloquear versión completa</a>
+            </section>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <div class="modal-backdrop" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+      <div class="modal-card">
+        <h2 id="modalTitle">Demo gratuita finalizada</h2>
+        <p>Demo gratuita finalizada. Desbloquea la versión completa para practicar sin límite.</p>
+        <button class="primary-button" id="modalClose" type="button">Entendido</button>
+      </div>
+    </div>
+
+    <script src="../app.js?v=17"></script>
+  </body>
+</html>
