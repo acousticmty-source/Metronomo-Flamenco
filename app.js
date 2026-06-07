@@ -5,6 +5,16 @@ const AUDIO_FILES = {
   pulse: "audio/pulso.wav",
 };
 
+const PALMAS_LOOP_FILES = {
+  rumbas: { url: "audio/palmas-rumba-100.wav", sourceBpm: 100 },
+  tangos: { url: "audio/palmas-tangos-188.wav", sourceBpm: 188 },
+  bulerias: { url: "audio/palmas-bulerias-90.wav", sourceBpm: 90 },
+  buleriasClasica: { url: "audio/palmas-bulerias-90.wav", sourceBpm: 90 },
+  alegrias: { url: "audio/palmas-alegrias-80.wav", sourceBpm: 80 },
+  fandangos: { url: "audio/palmas-fandangos-142.wav", sourceBpm: 142 },
+  sevillanas: { url: "audio/palmas-sevillanas-150.wav", sourceBpm: 150 },
+};
+
 const FREE_DEMO_BARS = 8; // Cambia a Infinity para quitar la limitación en la versión completa.
 const MERCADO_PAGO_URL = "https://www.mercadopago.com.mx/";
 const MIN_BPM = 40;
@@ -32,33 +42,33 @@ const soundPresets = {
 const palos = {
   rumbas: {
     label: "Rumbas",
-    bpm: 150,
+    bpm: 100,
     beats: ["1", "2", "3", "4"],
     accents: ["4"],
     weakBeats: ["1"],
   },
   tangos: {
     label: "Tangos",
-    bpm: 112,
+    bpm: 188,
     beats: ["1", "2", "3", "4"],
     accents: ["4"],
     weakBeats: ["1"],
   },
   bulerias: {
     label: "Bulerías 12-3-7-8-10",
-    bpm: 180,
+    bpm: 90,
     beats: ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
     accents: ["12", "3", "7", "8", "10"],
   },
   buleriasClasica: {
     label: "Bulerías 12-3-6-8-10",
-    bpm: 180,
+    bpm: 90,
     beats: ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
     accents: ["12", "3", "6", "8", "10"],
   },
   alegrias: {
     label: "Alegrías",
-    bpm: 150,
+    bpm: 80,
     beats: ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
     accents: ["12", "3", "6", "8", "10"],
     ornaments: [
@@ -88,13 +98,13 @@ const palos = {
   },
   fandangos: {
     label: "Fandangos",
-    bpm: 120,
+    bpm: 142,
     beats: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
     accents: ["1", "4", "7", "10"],
   },
   sevillanas: {
     label: "Sevillanas",
-    bpm: 120,
+    bpm: 150,
     beats: ["1", "2", "3"],
     accents: ["1"],
   },
@@ -128,6 +138,8 @@ let selectedSoundKey = "palmas";
 let bpm = palos[selectedPaloKey].bpm;
 let audioContext;
 let audioBuffers = { accent: null, pulse: null };
+let palmasLoopBuffers = {};
+let activePalmasLoop = null;
 let noiseBuffer = null;
 let schedulerTimer = null;
 let demoFinishTimer = null;
@@ -139,8 +151,10 @@ let customSelectsReady = false;
 
 function init() {
   elements.barsLimit.textContent = Number.isFinite(FREE_DEMO_BARS) ? String(FREE_DEMO_BARS) : "∞";
+
   populateSelect(elements.paloSelect, palos);
   populateSelect(elements.soundSelect, soundPresets);
+
   elements.paloSelect.value = selectedPaloKey;
   elements.soundSelect.value = selectedSoundKey;
   elements.unlockButton.href = MERCADO_PAGO_URL;
@@ -163,18 +177,23 @@ function populateSelect(select, items) {
 function enhanceSelect(select) {
   const wrap = select.closest(".select-wrap");
   if (!wrap || wrap.querySelector(".custom-select-trigger")) return;
+
   select.classList.add("native-select");
+
   const trigger = document.createElement("button");
   trigger.type = "button";
   trigger.className = "custom-select-trigger";
   trigger.setAttribute("aria-haspopup", "listbox");
   trigger.setAttribute("aria-expanded", "false");
+
   const menu = document.createElement("div");
   menu.className = "custom-select-menu";
   menu.setAttribute("role", "listbox");
   menu.hidden = true;
+
   wrap.append(trigger, menu);
   refreshCustomSelect(select);
+
   trigger.addEventListener("click", () => {
     vibrate();
     const willOpen = menu.hidden;
@@ -182,7 +201,9 @@ function enhanceSelect(select) {
     menu.hidden = !willOpen;
     trigger.setAttribute("aria-expanded", String(willOpen));
   });
+
   select.addEventListener("change", () => refreshCustomSelect(select));
+
   if (!customSelectsReady) {
     document.addEventListener("click", (event) => {
       if (!event.target.closest(".select-wrap")) closeCustomSelects();
@@ -196,9 +217,12 @@ function refreshCustomSelect(select) {
   const trigger = wrap.querySelector(".custom-select-trigger");
   const menu = wrap.querySelector(".custom-select-menu");
   const selected = select.options[select.selectedIndex];
+
   if (!trigger || !menu) return;
+
   trigger.textContent = selected?.textContent || "";
   menu.replaceChildren();
+
   [...select.options].forEach((option) => {
     const item = document.createElement("button");
     item.type = "button";
@@ -217,13 +241,18 @@ function refreshCustomSelect(select) {
 }
 
 function closeCustomSelects() {
-  document.querySelectorAll(".custom-select-menu").forEach((menu) => { menu.hidden = true; });
-  document.querySelectorAll(".custom-select-trigger").forEach((trigger) => { trigger.setAttribute("aria-expanded", "false"); });
+  document.querySelectorAll(".custom-select-menu").forEach((menu) => {
+    menu.hidden = true;
+  });
+  document.querySelectorAll(".custom-select-trigger").forEach((trigger) => {
+    trigger.setAttribute("aria-expanded", "false");
+  });
 }
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   if (window.location.protocol === "file:") return;
+
   navigator.serviceWorker.register("sw.js").catch((error) => {
     console.warn("No se pudo activar el modo instalable/offline.", error);
   });
@@ -233,8 +262,13 @@ function bindEvents() {
   document.addEventListener("pointerdown", (event) => {
     if (event.target.closest("button, a, .custom-select-trigger, .custom-select-option")) vibrate();
   });
+
   elements.paloSelect.addEventListener("change", (event) => updatePalo(event.target.value));
-  elements.soundSelect.addEventListener("change", (event) => { selectedSoundKey = event.target.value; });
+  elements.soundSelect.addEventListener("change", (event) => {
+    selectedSoundKey = event.target.value;
+    if (isPlaying) restartPalmasLoop();
+  });
+
   elements.decreaseBpm.addEventListener("click", () => setBpm(bpm - 1));
   elements.increaseBpm.addEventListener("click", () => setBpm(bpm + 1));
   elements.transportBpmMinus.addEventListener("click", () => setBpm(bpm - 1));
@@ -290,12 +324,14 @@ function setBpm(value) {
   elements.bpmSlider.value = bpm;
   const clockBpm = document.querySelector(".clock-bpm");
   if (clockBpm) clockBpm.textContent = bpm;
+  updatePalmasLoopRate();
 }
 
 function renderBeatGrid() {
   const palo = palos[selectedPaloKey];
   elements.beatGrid.replaceChildren();
   elements.beatGrid.dataset.count = String(palo.beats.length);
+
   const clockCore = document.createElement("div");
   clockCore.className = "clock-core";
   clockCore.innerHTML = `
@@ -308,12 +344,14 @@ function renderBeatGrid() {
     <span>BPM</span>
   `;
   elements.beatGrid.append(clockCore);
+
   palo.beats.forEach((beatLabel, index) => {
     const beat = document.createElement("div");
     beat.className = "beat";
     beat.textContent = beatLabel;
     beat.dataset.index = String(index);
     setClockPosition(beat, index, palo.beats.length);
+
     if (palo.accents.includes(beatLabel)) beat.classList.add("accent");
     if (palo.rests?.includes(beatLabel)) {
       beat.classList.add("rest");
@@ -323,8 +361,10 @@ function renderBeatGrid() {
       beat.classList.add("weak");
       beat.title = "Tiempo débil";
     }
+
     elements.beatGrid.append(beat);
   });
+
   updateVisualBeat(-1);
   updateBarsCounter();
 }
@@ -334,28 +374,41 @@ function setClockPosition(element, index, totalBeats) {
   const radius = totalBeats <= 4 ? 34 : 39;
   const x = 50 + Math.cos(angle) * radius;
   const y = 50 + Math.sin(angle) * radius;
+
   element.style.setProperty("--beat-x", `${x}%`);
   element.style.setProperty("--beat-y", `${y}%`);
 }
 
 async function startMetronome() {
   if (isPlaying) return;
+
   elements.demoModal.hidden = true;
   window.clearTimeout(demoFinishTimer);
   await ensureAudioReady();
+
   isPlaying = true;
   completedBars = 0;
   currentBeatIndex = 0;
   nextNoteTime = audioContext.currentTime + 0.06;
+  await startPalmasLoop(nextNoteTime);
   updateBarsCounter();
   schedulerTimer = window.setInterval(scheduler, SCHEDULER_INTERVAL_MS);
   scheduler();
 }
 
 async function ensureAudioReady() {
-  if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioContext.state === "suspended") await audioContext.resume();
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioContext.state === "suspended") {
+    await Promise.race([
+      audioContext.resume(),
+      new Promise((resolve) => window.setTimeout(resolve, 180)),
+    ]);
+  }
   if (USE_EXTERNAL_AUDIO_FILES) await loadAudioBuffers();
+  if (selectedSoundKey === "palmas") await loadPalmasLoop(selectedPaloKey);
   if (!noiseBuffer) noiseBuffer = createNoiseBuffer();
 }
 
@@ -364,30 +417,100 @@ function createNoiseBuffer() {
   const length = Math.floor(sampleRate * 0.22);
   const buffer = audioContext.createBuffer(1, length, sampleRate);
   const data = buffer.getChannelData(0);
+
   for (let i = 0; i < length; i += 1) {
     const white = Math.random() * 2 - 1;
     const taper = 1 - i / length;
     data[i] = white * (0.65 + taper * 0.35);
   }
+
   return buffer;
 }
 
 async function loadAudioBuffers() {
-  await Promise.all(Object.entries(AUDIO_FILES).map(async ([name, url]) => {
-    if (audioBuffers[name]) return;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`No se pudo cargar ${url}`);
-      const arrayBuffer = await response.arrayBuffer();
-      audioBuffers[name] = await audioContext.decodeAudioData(arrayBuffer);
-    } catch (error) {
-      console.warn(`${url} no está disponible. Se usará el sonido generado por la app.`, error);
-    }
-  }));
+  await Promise.all(
+    Object.entries(AUDIO_FILES).map(async ([name, url]) => {
+      if (audioBuffers[name]) return;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`No se pudo cargar ${url}`);
+        const arrayBuffer = await response.arrayBuffer();
+        audioBuffers[name] = await audioContext.decodeAudioData(arrayBuffer);
+      } catch (error) {
+        console.warn(`${url} no está disponible. Se usará el sonido generado por la app.`, error);
+      }
+    })
+  );
+}
+
+async function loadPalmasLoop(paloKey) {
+  const loop = PALMAS_LOOP_FILES[paloKey];
+  if (!loop || palmasLoopBuffers[paloKey]) return palmasLoopBuffers[paloKey] || null;
+
+  try {
+    const response = await fetch(loop.url);
+    if (!response.ok) throw new Error(`No se pudo cargar ${loop.url}`);
+    const arrayBuffer = await response.arrayBuffer();
+    palmasLoopBuffers[paloKey] = await audioContext.decodeAudioData(arrayBuffer);
+    return palmasLoopBuffers[paloKey];
+  } catch (error) {
+    console.warn(`${loop.url} no está disponible. Se usarán palmas generadas.`, error);
+    palmasLoopBuffers[paloKey] = null;
+    return null;
+  }
+}
+
+async function startPalmasLoop(time = audioContext.currentTime + 0.02) {
+  stopPalmasLoop();
+  if (selectedSoundKey !== "palmas") return;
+
+  const loop = PALMAS_LOOP_FILES[selectedPaloKey];
+  const buffer = await loadPalmasLoop(selectedPaloKey);
+  if (!loop || !buffer) return;
+
+  const source = audioContext.createBufferSource();
+  const gain = audioContext.createGain();
+  source.buffer = buffer;
+  source.loop = true;
+  source.playbackRate.setValueAtTime(getPalmasLoopRate(), time);
+  gain.gain.setValueAtTime(0.72, time);
+  source.connect(gain).connect(audioContext.destination);
+  source.start(time);
+  activePalmasLoop = { source, gain, loop };
+}
+
+function restartPalmasLoop() {
+  stopPalmasLoop();
+  if (selectedSoundKey === "palmas") startPalmasLoop();
+}
+
+function stopPalmasLoop() {
+  if (!activePalmasLoop) return;
+  try {
+    activePalmasLoop.gain.gain.cancelScheduledValues(audioContext.currentTime);
+    activePalmasLoop.gain.gain.setTargetAtTime(0.0001, audioContext.currentTime, 0.015);
+    activePalmasLoop.source.stop(audioContext.currentTime + 0.05);
+  } catch (error) {
+    // El source puede estar ya detenido; no hace falta interrumpir la app por eso.
+  }
+  activePalmasLoop = null;
+}
+
+function updatePalmasLoopRate() {
+  if (!activePalmasLoop || !audioContext) return;
+  activePalmasLoop.source.playbackRate.setTargetAtTime(getPalmasLoopRate(), audioContext.currentTime, 0.02);
+}
+
+function getPalmasLoopRate() {
+  const loop = PALMAS_LOOP_FILES[selectedPaloKey];
+  if (!loop) return 1;
+  return Math.min(2.2, Math.max(0.45, bpm / loop.sourceBpm));
 }
 
 function scheduler() {
   if (!isPlaying) return;
+
   while (nextNoteTime < audioContext.currentTime + SCHEDULE_AHEAD_SECONDS) {
     scheduleBeat(currentBeatIndex, nextNoteTime);
     advanceBeat();
@@ -400,16 +523,32 @@ function scheduleBeat(beatIndex, time) {
   const isAccent = palo.accents.includes(beatLabel);
   const isRest = palo.rests?.includes(beatLabel);
   const isWeak = palo.weakBeats?.includes(beatLabel);
-  if (!isRest) playSound(isAccent ? "accent" : "pulse", time, isAccent, isWeak ? WEAK_BEAT_VOLUME : 1);
+
+  if (!isRest) {
+    if (!isPalmasLoopActive()) {
+      playSound(isAccent ? "accent" : "pulse", time, isAccent, isWeak ? WEAK_BEAT_VOLUME : 1);
+    }
+  }
+
   const secondsPerBeat = 60 / bpm;
-  palo.ornaments?.filter((ornament) => ornament.beat === beatLabel).forEach((ornament) => {
-    playSound("pulse", time + secondsPerBeat * ornament.offsetBeats, false, ornament.volume);
-  });
+  palo.ornaments
+    ?.filter((ornament) => ornament.beat === beatLabel)
+    .forEach((ornament) => {
+      if (!isPalmasLoopActive()) {
+        playSound("pulse", time + secondsPerBeat * ornament.offsetBeats, false, ornament.volume);
+      }
+    });
+
   window.setTimeout(() => updateVisualBeat(beatIndex), Math.max(0, (time - audioContext.currentTime) * 1000));
+}
+
+function isPalmasLoopActive() {
+  return selectedSoundKey === "palmas" && !!activePalmasLoop;
 }
 
 function playSound(type, time, isAccent, volume = 1) {
   const buffer = audioBuffers[type];
+
   if (buffer) {
     const source = audioContext.createBufferSource();
     const gain = audioContext.createGain();
@@ -419,9 +558,17 @@ function playSound(type, time, isAccent, volume = 1) {
     source.start(time);
     return;
   }
+
   const preset = soundPresets[selectedSoundKey];
-  if (preset.kind === "palmas") return playPalmas(time, isAccent, volume);
-  if (preset.kind === "cajon") return playCajon(time, isAccent, volume);
+  if (preset.kind === "palmas") {
+    playPalmas(time, isAccent, volume);
+    return;
+  }
+  if (preset.kind === "cajon") {
+    playCajon(time, isAccent, volume);
+    return;
+  }
+
   playMadera(time, isAccent, volume);
 }
 
@@ -437,6 +584,7 @@ function playPalmas(time, isAccent, volume = 1) {
         { offset: 0, gain: 0.23, band: 2450, duration: 0.032, q: 0.48 },
         { offset: 0.009, gain: 0.13, band: 3200, duration: 0.026, q: 0.5 },
       ];
+
   bursts.forEach((burst) => {
     playNoiseHit({
       time: time + burst.offset + humanOffset,
@@ -453,13 +601,14 @@ function playPalmas(time, isAccent, volume = 1) {
 }
 
 function playMadera(time, isAccent, volume = 1) {
+  const peak = (isAccent ? 0.28 : 0.18) * volume;
   playNoiseHit({
     time,
     duration: isAccent ? 0.07 : 0.052,
     band: isAccent ? 1550 : 1250,
     lowpass: 4200,
     highpass: 240,
-    noiseGain: (isAccent ? 0.28 : 0.18) * volume,
+    noiseGain: peak,
     bodyFrequency: isAccent ? 620 : 480,
     bodyGain: (isAccent ? 0.16 : 0.09) * volume,
     q: 1.45,
@@ -500,6 +649,7 @@ function playNoiseHit({ time, duration, band, lowpass: lowpassFrequency, highpas
   const body = audioContext.createOscillator();
   const bodyGain = audioContext.createGain();
   const master = audioContext.createGain();
+
   noise.buffer = noiseBuffer;
   highpass.type = "highpass";
   highpass.frequency.setValueAtTime(highpassFrequency, time);
@@ -508,16 +658,20 @@ function playNoiseHit({ time, duration, band, lowpass: lowpassFrequency, highpas
   bandpass.Q.setValueAtTime(q, time);
   lowpass.type = "lowpass";
   lowpass.frequency.setValueAtTime(lowpassFrequency, time);
+
   noiseGain.gain.setValueAtTime(0.0001, time);
   noiseGain.gain.linearRampToValueAtTime(Math.max(0.0002, peakNoise), time + 0.004);
   noiseGain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+
   body.type = "sine";
   body.frequency.setValueAtTime(bodyFrequency, time);
   body.frequency.exponentialRampToValueAtTime(Math.max(50, bodyFrequency * 0.62), time + duration);
   bodyGain.gain.setValueAtTime(0.0001, time);
   bodyGain.gain.linearRampToValueAtTime(Math.max(0.0002, peakBody), time + 0.004);
   bodyGain.gain.exponentialRampToValueAtTime(0.001, time + duration * 0.88);
+
   master.gain.setValueAtTime(0.84, time);
+
   noise.connect(highpass).connect(bandpass).connect(lowpass).connect(noiseGain).connect(master).connect(audioContext.destination);
   body.connect(bodyGain).connect(master);
   noise.start(time);
@@ -528,20 +682,26 @@ function playNoiseHit({ time, duration, band, lowpass: lowpassFrequency, highpas
 
 function advanceBeat() {
   const palo = palos[selectedPaloKey];
-  nextNoteTime += 60 / bpm;
+  const secondsPerBeat = 60 / bpm;
+
+  nextNoteTime += secondsPerBeat;
   currentBeatIndex += 1;
+
   if (currentBeatIndex >= palo.beats.length) {
     currentBeatIndex = 0;
     completedBars += 1;
     updateBarsCounter();
+
     if (completedBars >= FREE_DEMO_BARS) scheduleDemoFinish(nextNoteTime);
   }
 }
 
 function scheduleDemoFinish(time) {
   isPlaying = false;
+  stopPalmasLoop();
   window.clearInterval(schedulerTimer);
   schedulerTimer = null;
+
   demoFinishTimer = window.setTimeout(() => {
     stopMetronome({ resetVisual: true });
     elements.demoModal.hidden = false;
@@ -551,6 +711,7 @@ function scheduleDemoFinish(time) {
 
 function stopMetronome(options = {}) {
   const { resetVisual = false, hideModal = false } = options;
+
   isPlaying = false;
   window.clearInterval(schedulerTimer);
   window.clearTimeout(demoFinishTimer);
@@ -559,6 +720,7 @@ function stopMetronome(options = {}) {
   currentBeatIndex = 0;
   completedBars = 0;
   updateBarsCounter();
+
   if (resetVisual) updateVisualBeat(-1);
   if (hideModal) elements.demoModal.hidden = true;
 }

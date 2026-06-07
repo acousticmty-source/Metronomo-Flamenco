@@ -130,19 +130,20 @@ body.light-mode .poster-shell::before {
 
 .app-nav {
   display: grid;
-  grid-template-columns: 1fr 3rem;
+  grid-template-columns: 1fr 4.3rem;
   align-items: center;
   gap: 0.75rem;
 }
 
 .settings-button {
-  width: 3rem;
-  aspect-ratio: 1;
-  border: 0;
-  border-radius: 50%;
+  min-height: 2.65rem;
+  border: 1px solid rgba(217, 165, 69, 0.4);
+  border-radius: 999px;
   color: var(--white);
-  background: transparent;
-  font-size: 1.75rem;
+  background: rgba(217, 165, 69, 0.08);
+  font-family: Arial, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .settings-button:hover,
@@ -261,7 +262,7 @@ select option {
 
 .settings-panel {
   justify-self: end;
-  width: min(100%, 15rem);
+  width: min(100%, 18rem);
   padding: 0.7rem;
   display: flex;
   align-items: center;
@@ -275,14 +276,28 @@ select option {
   font-size: 0.85rem;
 }
 
-.theme-toggle {
+.theme-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.28rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.theme-option {
   min-height: 2.15rem;
   padding: 0 1rem;
-  border: 1px solid rgba(217, 165, 69, 0.4);
+  border: 0;
   border-radius: 999px;
   color: var(--white);
-  background: rgba(217, 165, 69, 0.08);
+  background: transparent;
   font-size: 0.86rem;
+}
+
+.theme-option[aria-pressed="true"] {
+  color: #120b0b;
+  background: linear-gradient(180deg, #f2c162, var(--gold));
 }
 
 .compas-section {
@@ -352,12 +367,24 @@ select option {
 .palmas-icon {
   width: clamp(4.3rem, 17vw, 5.7rem);
   height: clamp(4.3rem, 17vw, 5.7rem);
-  fill: none;
   stroke: var(--gold);
-  stroke-width: 5.5;
+  stroke-width: 4.2;
   stroke-linecap: round;
   stroke-linejoin: round;
   transform: rotate(-18deg);
+  filter: drop-shadow(0 0 0.7rem rgba(217, 165, 69, 0.22));
+}
+
+.palm-fill {
+  fill: rgba(217, 165, 69, 0.22);
+}
+
+.palm-line {
+  fill: none;
+}
+
+.rays {
+  stroke-width: 4.8;
 }
 
 .clock-bpm {
@@ -425,6 +452,20 @@ body.light-mode .beat.weak {
 .control-panel {
   display: grid;
   gap: 0.75rem;
+}
+
+.sound-select-wrap {
+  width: min(100%, 17.5rem);
+  margin: 0 auto;
+  z-index: 7;
+}
+
+.sound-select-wrap .custom-select-trigger {
+  min-height: 2.85rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  font-style: normal;
 }
 
 .bpm-section {
@@ -500,6 +541,13 @@ body.light-mode .beat.weak {
   background: rgba(217, 165, 69, 0.08);
   border: 1px solid rgba(217, 165, 69, 0.38);
   text-align: center;
+}
+
+button:active,
+a:active,
+.custom-select-trigger:active,
+.custom-select-option:active {
+  transform: scale(0.97);
 }
 
 .modal-backdrop {

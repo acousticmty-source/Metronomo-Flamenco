@@ -10,30 +10,34 @@ En celular, si el navegador bloquea el sonido, pulsa `Iniciar` una vez: esa inte
 
 ## 2. Sonidos sin archivos WAV
 
-La app ya funciona sin subir archivos de audio. Los golpes se generan con Web Audio API:
+La app ya funciona sin subir archivos de audio. Los golpes se generan con Web Audio API.
 
-- tiempos acentuados: golpe más fuerte y agudo
-- tiempos normales: golpe más suave
+Sonidos disponibles:
 
-La interfaz incluye un selector de sonido:
-
-- Palmas secas
+- Palmas
 - Madera
-- Cajón tapa
-- Click suave
+- Cajón
 
-Puedes cambiar el carácter de cada sonido en `app.js`, dentro del objeto `soundPresets`.
+Puedes cambiar el carácter de cada sonido en `app.js`, dentro de las funciones `playPalmas`, `playMadera` y `playCajon`.
 
 ## 3. Usar audios externos opcionalmente
 
-Si más adelante quieres usar tus propios WAV, coloca los archivos en la carpeta `audio`:
+Para usar loops reales de palmas por palo, coloca estos WAV en la carpeta `audio`:
 
 ```text
-audio/acento.wav
-audio/pulso.wav
+audio/palmas-rumba-100.wav
+audio/palmas-tangos-188.wav
+audio/palmas-bulerias-90.wav
+audio/palmas-alegrias-80.wav
+audio/palmas-sevillanas-150.wav
+audio/palmas-fandangos-142.wav
 ```
 
-Después cambia en `app.js`:
+Cuando el selector de sonido esté en `Palmas`, la app intentará cargar el loop del palo seleccionado. Si no existe, usará las palmas generadas.
+
+No subas loops de librerías comerciales a un repositorio público si la licencia no permite redistribuirlos.
+
+Si más adelante quieres usar golpes WAV sueltos para acento y pulso, cambia en `app.js`:
 
 ```js
 const USE_EXTERNAL_AUDIO_FILES = false;
@@ -62,6 +66,7 @@ Edita el objeto `palos` en `app.js`. Cada palo tiene:
 - `accents`: los tiempos que deben sonar y verse acentuados.
 - `rests`: tiempos visibles que no deben sonar.
 - `weakBeats`: tiempos que suenan con volumen muy bajo.
+- `ornaments`: golpes suaves añadidos entre tiempos.
 - `bpm`: el BPM inicial sugerido.
 
 Ejemplo:
@@ -69,28 +74,24 @@ Ejemplo:
 ```js
 tangos: {
   label: "Tangos",
-  bpm: 120,
-  beats: ["1", "2", "3", "4"],
-  accents: ["4"],
-}
-```
-
-Ejemplo con silencio:
-
-```js
-rumbas: {
-  label: "Rumbas",
-  bpm: 100,
+  bpm: 112,
   beats: ["1", "2", "3", "4"],
   accents: ["4"],
   weakBeats: ["1"],
 }
 ```
 
-La app incluye dos patrones de Bulerías:
+Ejemplo con adornos:
 
-- `Bulerías 12-3-7-8-10`
-- `Bulerías 12-3-6-8-10`
+```js
+alegrias: {
+  label: "Alegrías",
+  bpm: 150,
+  beats: ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
+  accents: ["12", "3", "6", "8", "10"],
+  ornaments: [{ beat: "3", offsetBeats: 0.5, volume: 0.34 }],
+}
+```
 
 ## 5. Cómo quitar la limitación de 8 compases
 
@@ -106,7 +107,7 @@ por:
 const FREE_DEMO_BARS = Infinity;
 ```
 
-El botón `Desbloquear versión completa` está preparado como elemento visual, pero todavía no implementa pagos.
+El botón `Desbloquear versión completa` abre el enlace configurado en `MERCADO_PAGO_URL`.
 
 ## 6. Modo instalable PWA
 
@@ -130,10 +131,8 @@ Después abre:
 http://127.0.0.1:4173
 ```
 
-Si el navegador muestra una versión anterior, cierra esa pestaña y abre una URL con versión nueva, por ejemplo:
+Si el navegador muestra una versión anterior, cierra esa pestaña y abre una URL con versión nueva:
 
 ```text
-http://127.0.0.1:4173/index.html?v=16
+http://127.0.0.1:4173/index.html?v=19
 ```
-
-También puedes usar otro puerto local para evitar una caché antigua del service worker.
