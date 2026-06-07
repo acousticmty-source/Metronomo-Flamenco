@@ -2,7 +2,7 @@
   "name": "Metrónomo Flamenco",
   "short_name": "Flamenco",
   "description": "Metrónomo flamenco con compás circular, palos y acentos.",
-  "start_url": "./index.html?v=25",
+  "start_url": "./index.html?v=26",
   "display": "standalone",
   "background_color": "#0d0808",
   "theme_color": "#120b0b",
