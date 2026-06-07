@@ -133,7 +133,7 @@ http://127.0.0.1:4173
 Si el navegador muestra una versión anterior, cierra esa pestaña y abre una URL con versión nueva, por ejemplo:
 
 ```text
-http://127.0.0.1:4173/index.html?v=15
+http://127.0.0.1:4173/index.html?v=16
 ```
 
 También puedes usar otro puerto local para evitar una caché antigua del service worker.

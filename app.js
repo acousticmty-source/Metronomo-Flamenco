@@ -6,6 +6,7 @@ const AUDIO_FILES = {
 };
 
 const FREE_DEMO_BARS = 8; // Cambia a Infinity para quitar la limitación en la versión completa.
+const MERCADO_PAGO_URL = "https://www.mercadopago.com.mx/";
 const MIN_BPM = 40;
 const MAX_BPM = 240;
 const WEAK_BEAT_VOLUME = 0.12;
@@ -127,6 +128,10 @@ const elements = {
   barsLimit: document.querySelector("#barsLimit"),
   demoModal: document.querySelector("#demoModal"),
   modalClose: document.querySelector("#modalClose"),
+  settingsButton: document.querySelector("#settingsButton"),
+  settingsPanel: document.querySelector("#settingsPanel"),
+  themeToggle: document.querySelector("#themeToggle"),
+  unlockButton: document.querySelector("#unlockButton"),
 };
 
 let selectedPaloKey = "rumbas";
@@ -151,8 +156,9 @@ function init() {
 
   elements.paloSelect.value = selectedPaloKey;
   elements.soundSelect.value = selectedSoundKey;
+  elements.unlockButton.href = MERCADO_PAGO_URL;
+  applySavedTheme();
   enhanceSelect(elements.paloSelect);
-  enhanceSelect(elements.soundSelect);
   bindEvents();
   updatePalo(selectedPaloKey);
   registerServiceWorker();
@@ -276,6 +282,26 @@ function bindEvents() {
     elements.demoModal.hidden = true;
     elements.startButton.focus();
   });
+  elements.settingsButton.addEventListener("click", () => {
+    elements.settingsPanel.hidden = !elements.settingsPanel.hidden;
+  });
+  elements.themeToggle.addEventListener("click", toggleTheme);
+}
+
+function applySavedTheme() {
+  const savedTheme = localStorage.getItem("metronomo-theme") || "dark";
+  const lightMode = savedTheme === "light";
+  document.body.classList.toggle("light-mode", lightMode);
+  elements.themeToggle.textContent = lightMode ? "Claro" : "Oscuro";
+  elements.themeToggle.setAttribute("aria-pressed", String(lightMode));
+}
+
+function toggleTheme() {
+  const lightMode = !document.body.classList.contains("light-mode");
+  document.body.classList.toggle("light-mode", lightMode);
+  localStorage.setItem("metronomo-theme", lightMode ? "light" : "dark");
+  elements.themeToggle.textContent = lightMode ? "Claro" : "Oscuro";
+  elements.themeToggle.setAttribute("aria-pressed", String(lightMode));
 }
 
 function updatePalo(key) {

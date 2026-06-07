@@ -5,26 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#050404">
     <title>Metrónomo Flamenco</title>
-    <link rel="manifest" href="manifest.webmanifest?v=15">
-    <link rel="icon" href="icon.svg?v=15" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css?v=15">
+    <link rel="manifest" href="manifest.webmanifest?v=16">
+    <link rel="icon" href="icon.svg?v=16" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css?v=16">
   </head>
   <body>
     <main class="poster-shell app-only">
       <aside class="phone-area" aria-label="App metrónomo">
-        <div class="app-title">
-          <span>Metrónomo</span>
-          <strong>Flamenco</strong>
-        </div>
         <div class="phone-frame">
           <div class="phone-screen">
-            <div class="phone-status">
-              <span>9:41</span>
-              <span>▰ ))) ▱</span>
-            </div>
-
             <div class="app-nav">
-              <button type="button" aria-label="Menú">☰</button>
               <div class="select-wrap compact-select">
                 <select id="paloSelect" aria-label="Seleccionar palo flamenco">
                   <option value="rumbas">Rumbas</option>
@@ -38,27 +28,26 @@
                   <option value="sevillanas">Sevillanas</option>
                 </select>
               </div>
-              <button type="button" aria-label="Ajustes">⚙</button>
+              <button class="settings-button" id="settingsButton" type="button" aria-label="Ajustes">⚙</button>
+            </div>
+
+            <div class="settings-panel" id="settingsPanel" hidden>
+              <span>Modo</span>
+              <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Oscuro</button>
             </div>
 
             <section class="compas-section" aria-label="Compás visual">
-              <div class="status-row">
-                <span id="patternName">Rumbas</span>
-                <span><strong id="barsCounter">0</strong>/<span id="barsLimit">8</span></span>
-              </div>
+              <div class="demo-counter"><strong id="barsCounter">0</strong>/<span id="barsLimit">8</span></div>
               <div class="beat-clock" id="beatGrid" aria-live="polite" aria-label="Reloj del compás"></div>
             </section>
 
             <section class="control-panel" aria-label="Controles del metrónomo">
-              <label class="field-label sr-only" for="soundSelect">Sonido</label>
-              <div class="select-wrap sound-wrap">
-                <select id="soundSelect" aria-label="Seleccionar sonido del metrónomo">
-                  <option value="palmas">Palmas secas</option>
-                  <option value="madera">Madera</option>
-                  <option value="cajon">Cajón tapa</option>
-                  <option value="clickSuave">Click suave</option>
-                </select>
-              </div>
+              <select class="sr-only" id="soundSelect" aria-label="Seleccionar sonido del metrónomo">
+                <option value="palmas">Palmas secas</option>
+                <option value="madera">Madera</option>
+                <option value="cajon">Cajón tapa</option>
+                <option value="clickSuave">Click suave</option>
+              </select>
 
               <div class="bpm-section">
                 <span class="field-label">BPM</span>
@@ -77,14 +66,8 @@
               </div>
               <button class="secondary-button stop-full" id="stopButton" type="button">Detener</button>
 
-              <button class="unlock-button" type="button">Desbloquear versión completa</button>
+              <a class="unlock-button" id="unlockButton" href="#" target="_blank" rel="noopener">Desbloquear versión completa</a>
             </section>
-
-            <nav class="bottom-tabs" aria-label="Secciones">
-              <span class="active">◉<small>Compás</small></span>
-              <span>♬<small>Sonido</small></span>
-              <span>⚙<small>Ajustes</small></span>
-            </nav>
           </div>
         </div>
       </aside>
@@ -98,6 +81,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=15"></script>
+    <script src="app.js?v=16"></script>
   </body>
 </html>
