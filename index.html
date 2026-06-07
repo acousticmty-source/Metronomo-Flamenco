@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#050404">
     <title>Metrónomo Flamenco</title>
-    <link rel="manifest" href="manifest.webmanifest?v=17">
-    <link rel="icon" href="icon.svg?v=17" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css?v=17">
+    <link rel="manifest" href="manifest.webmanifest?v=18">
+    <link rel="icon" href="icon.svg?v=18" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css?v=18">
+    <style>
+      .app-nav{grid-template-columns:1fr 4.3rem}.settings-button{min-height:2.65rem;border:1px solid rgba(217,165,69,.4);border-radius:999px;color:var(--white);background:rgba(217,165,69,.08);font-family:Arial,sans-serif;font-size:.86rem;font-weight:800}.settings-panel{width:min(100%,18rem)}.theme-choice{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;padding:.2rem;border-radius:999px;background:rgba(0,0,0,.22)}.theme-option{min-height:2.15rem;padding:0 1rem;border:0;border-radius:999px;color:var(--white);background:transparent;font-size:.86rem}.theme-option[aria-pressed="true"]{color:#120b0b;background:linear-gradient(180deg,#f2c162,var(--gold))}.sound-select-wrap{width:min(100%,17.5rem);margin:0 auto;z-index:7}.sound-select-wrap .custom-select-trigger{min-height:2.85rem;border:1px solid var(--line);background:rgba(255,255,255,.035);font-size:clamp(1rem,4vw,1.15rem);font-style:normal}.palmas-icon{stroke-width:4.2;filter:drop-shadow(0 0 .7rem rgba(217,165,69,.22))}.palm-fill{fill:rgba(217,165,69,.22)}.palm-line{fill:none}.rays{stroke-width:4.8}button:active,a:active,.custom-select-trigger:active,.custom-select-option:active{transform:scale(.97)}
+    </style>
   </head>
   <body>
     <main class="poster-shell app-only">
@@ -28,12 +31,15 @@
                   <option value="sevillanas">Sevillanas</option>
                 </select>
               </div>
-              <button class="settings-button" id="settingsButton" type="button" aria-label="Ajustes">⚙</button>
+              <button class="settings-button" id="settingsButton" type="button" aria-label="Abrir tema">Tema</button>
             </div>
 
             <div class="settings-panel" id="settingsPanel" hidden>
               <span>Modo</span>
-              <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Oscuro</button>
+              <div class="theme-choice" role="group" aria-label="Cambiar tema">
+                <button class="theme-option" type="button" data-theme="dark" aria-pressed="true">Oscuro</button>
+                <button class="theme-option" type="button" data-theme="light" aria-pressed="false">Claro</button>
+              </div>
             </div>
             <span id="patternName" hidden>Rumbas</span>
 
@@ -43,12 +49,13 @@
             </section>
 
             <section class="control-panel" aria-label="Controles del metrónomo">
-              <select class="sr-only" id="soundSelect" aria-label="Seleccionar sonido del metrónomo">
-                <option value="palmas">Palmas secas</option>
-                <option value="madera">Madera</option>
-                <option value="cajon">Cajón tapa</option>
-                <option value="clickSuave">Click suave</option>
-              </select>
+              <div class="select-wrap sound-select-wrap">
+                <select id="soundSelect" aria-label="Seleccionar sonido del metrónomo">
+                  <option value="palmas">Palmas</option>
+                  <option value="madera">Madera</option>
+                  <option value="cajon">Cajón</option>
+                </select>
+              </div>
 
               <div class="bpm-section">
                 <span class="field-label">BPM</span>
@@ -82,6 +89,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=17"></script>
+    <script src="app.js?v=18"></script>
   </body>
 </html>
